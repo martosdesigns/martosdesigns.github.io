@@ -57,7 +57,7 @@
       <div class="wrap">
         <div class="eyebrow">02 — Vídeo</div>
         <h1>Edición de Vídeo</h1>
-        <p class="sec-desc">Montaje, motion graphics y color. Sustituye cada placeholder por tu clip o enlace de YouTube/Vimeo.</p>
+        <p class="sec-desc">Montaje, motion graphics y corrección de color.</p>
       </div>
     </div>
 
@@ -66,10 +66,9 @@
          La tira de timecodes (.tc-strip) es solo decorativa, un guiño
          a la identidad de editor de vídeo — no representa nada real.
 
-         La primera tarjeta ya tiene un proyecto real: enlaza al vídeo
-         de YouTube y usa la miniatura propia como portada, en vez del
-         hueco de placeholder gris. El resto siguen pendientes de
-         sustituir (ver el patrón "ph ph-video" + "ph-tag").
+         Las tarjetas las pinta render.js con los vídeos que das de alta
+         en el panel de administración (sección Vídeo): cada una enlaza
+         a su vídeo de YouTube y usa tu miniatura como portada.
          =========================================================== -->
     <section class="section-light">
       <div class="wrap">
@@ -87,62 +86,7 @@
           </div>
         </div>
 
-        <div class="carousel" id="car-clips">
-
-          <!-- Proyecto real: VLOG en Japón #1 (enlaza a YouTube) -->
-          <div class="card carousel-item carousel-item--card">
-            <a
-              href="https://www.youtube.com/watch?v=3Z7yGwcP_nc&t=163s"
-              target="_blank" rel="noopener"
-              class="ph ph-video"
-              style="border:none; padding:0; display:block;"
-            >
-              <img src="assets/video/vlog-japon-1.jpg" alt="VLOG en JAPÓN #1 — La llegada" style="width:100%; height:100%; object-fit:cover;">
-              <div class="playbtn" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);"></div>
-            </a>
-            <div class="card-body">
-              <div class="card-title">VLOG en JAPÓN #1</div>
-              <div class="card-sub">Personal</div>
-            </div>
-          </div>
-
-          <!-- Placeholders pendientes de sustituir -->
-          <div class="card carousel-item carousel-item--card">
-            <div class="ph ph-video"><span class="ph-tag">CLIP 02</span><div class="playbtn"></div></div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Tipo de trabajo — cliente / marca</div>
-            </div>
-          </div>
-          <div class="card carousel-item carousel-item--card">
-            <div class="ph ph-video"><span class="ph-tag">CLIP 03</span><div class="playbtn"></div></div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Tipo de trabajo — cliente / marca</div>
-            </div>
-          </div>
-          <div class="card carousel-item carousel-item--card">
-            <div class="ph ph-video"><span class="ph-tag">CLIP 04</span><div class="playbtn"></div></div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Tipo de trabajo — cliente / marca</div>
-            </div>
-          </div>
-          <div class="card carousel-item carousel-item--card">
-            <div class="ph ph-video"><span class="ph-tag">CLIP 05</span><div class="playbtn"></div></div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Tipo de trabajo — cliente / marca</div>
-            </div>
-          </div>
-          <div class="card carousel-item carousel-item--card">
-            <div class="ph ph-video"><span class="ph-tag">CLIP 06</span><div class="playbtn"></div></div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Tipo de trabajo — cliente / marca</div>
-            </div>
-          </div>
-        </div>
+        <div class="carousel" id="car-clips" data-render="video"></div>
       </div>
     </section>
 
@@ -150,6 +94,13 @@
 
   <footer>© 2026 Eric Martos — martos.designs</footer>
 
+  <!-- Contenido dinámico: SDK de Firebase → configuración → datos → pintado.
+       Después, script.js activa el comportamiento (carruseles, animaciones...). -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="data.js"></script>
+  <script src="render.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

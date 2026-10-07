@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Panel privado: que los buscadores no lo indexen -->
+  <meta name="robots" content="noindex, nofollow">
+  <title>Panel de administración — Martos Designs</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<!-- page-ready: aquí no se usa el fundido de entrada de script.js -->
+<body class="admin page-ready">
+
+  <!-- ===========================================================
+       AVISO: Firebase sin configurar (firebase-config.js con "PEGA_AQUI")
+       =========================================================== -->
+  <main class="admin-center" id="setup-view" hidden>
+    <div class="admin-card">
+      <h1>Falta configurar Firebase</h1>
+      <p>Abre <code>firebase-config.js</code> y pega los datos de tu proyecto de Firebase. Los pasos están en <code>LEEME-PANEL.md</code>.</p>
+      <p class="muted" id="setup-detail"></p>
+    </div>
+  </main>
+
+  <!-- ===========================================================
+       LOGIN — solo entra la cuenta creada en Firebase Authentication
+       =========================================================== -->
+  <main class="admin-center" id="login-view" hidden>
+    <form class="admin-card" id="login-form" novalidate>
+      <h1>Panel de administración</h1>
+      <p class="muted">Acceso privado.</p>
+
+      <p class="notice" id="file-warning" hidden>
+        Estás abriendo el panel como archivo local. El inicio de sesión de Firebase solo
+        funciona desde la web publicada o desde un servidor local (por ejemplo <code>npx serve</code>).
+      </p>
+
+      <label class="field">
+        <span>Correo</span>
+        <input type="email" id="login-email" autocomplete="username" required>
+      </label>
+      <label class="field">
+        <span>Contraseña</span>
+        <input type="password" id="login-password" autocomplete="current-password" required>
+      </label>
+      <p class="form-error" id="login-error" role="alert" hidden></p>
+      <button type="submit" class="btn btn-primary" id="login-submit">Entrar</button>
+    </form>
+  </main>
+
+  <!-- ===========================================================
+       PANEL — listado de piezas y acciones
+       =========================================================== -->
+  <div id="app-view" hidden>
+
+    <header class="admin-bar">
+      <strong class="admin-brand">Panel · Martos Designs</strong>
+      <div class="admin-bar-right">
+        <span class="muted" id="user-email"></span>
+        <!-- ?fresh evita la caché de 5 minutos para ver los cambios al momento -->
+        <a class="btn btn-ghost" href="index.html?fresh" target="_blank" rel="noopener">Ver web</a>
+        <button type="button" class="btn btn-ghost" id="btn-logout">Cerrar sesión</button>
+      </div>
+    </header>
+
+    <div class="admin-wrap">
+
+      <div class="admin-toolbar">
+        <div class="tabs" id="seccion-tabs" role="tablist" aria-label="Sección">
+          <button type="button" class="tab" role="tab" data-seccion="diseno" aria-selected="true">Diseño <span class="tab-count"></span></button>
+          <button type="button" class="tab" role="tab" data-seccion="video" aria-selected="false">Vídeo <span class="tab-count"></span></button>
+          <button type="button" class="tab" role="tab" data-seccion="web" aria-selected="false">Web <span class="tab-count"></span></button>
+        </div>
+        <div class="admin-actions">
+          <button type="button" class="btn btn-primary" id="btn-add">Añadir pieza</button>
+          <button type="button" class="btn" id="btn-bulk">Añadir varias</button>
+          <button type="button" class="btn" id="btn-tipos">Tipos de diseño</button>
+        </div>
+      </div>
+
+      <div class="admin-filter" id="tipo-filter-wrap">
+        <label class="field field-inline">
+          <span>Mostrar</span>
+          <select id="tipo-filter"></select>
+        </label>
+      </div>
+
+      <p class="notice" id="load-error" role="alert" hidden></p>
+      <ul class="pieza-list" id="piezas-list"></ul>
+    </div>
+  </div>
+
+  <!-- ===========================================================
+       MODAL: añadir / editar una pieza
+       Los campos con data-for solo se ven en esas secciones.
+       =========================================================== -->
+  <div class="modal" id="modal-pieza" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-pieza-title">
+      <h2 id="modal-pieza-title">Añadir pieza</h2>
+      <form id="pieza-form" novalidate>
+
+        <div class="field-row">
+          <label class="field">
+            <span>Sección</span>
+            <select id="f-seccion">
+              <option value="diseno">Diseño</option>
+              <option value="video">Vídeo</option>
+              <option value="web">Web</option>
+            </select>
+          </label>
+          <label class="field" data-for="diseno">
+            <span>Tipo</span>
+            <select id="f-tipo"></select>
+          </label>
+        </div>
+
+        <label class="field">
+          <span>Título</span>
+          <input type="text" id="f-titulo" maxlength="120" required>
+        </label>
+
+        <label class="field" data-for="video web">
+          <span>Subtítulo <em>(opcional)</em></span>
+          <input type="text" id="f-subtitulo" maxlength="140" placeholder="Ej.: Personal, o el nombre del cliente">
+        </label>
+
+        <label class="field">
+          <span id="f-ruta-label">Imagen (ruta)</span>
+          <input type="text" id="f-ruta" list="assets-list" placeholder="assets/logos/logo-01.jpg" autocomplete="off">
+          <small>La ruta del archivo dentro de la carpeta del sitio. Debe estar copiado y publicado.</small>
+        </label>
+        <div class="preview">
+          <img id="f-preview" alt="Vista previa" hidden>
+          <span class="muted" id="f-preview-msg">Sin imagen</span>
+        </div>
+
+        <label class="field" data-for="diseno">
+          <span>Pack <em>(opcional)</em></span>
+          <input type="text" id="f-pack" list="packs-list" maxlength="80" placeholder="Ej.: Canal de Lucanji" autocomplete="off">
+          <small>Las piezas con el mismo nombre de pack se agrupan y se ven juntas.</small>
+        </label>
+
+        <label class="field" data-for="video web">
+          <span id="f-url-label">Enlace</span>
+          <input type="url" id="f-url" placeholder="https://" autocomplete="off">
+        </label>
+
+        <label class="field" data-for="web">
+          <span>Etiquetas <em>(separadas por comas)</em></span>
+          <input type="text" id="f-etiquetas" placeholder="HTML, CSS, JS">
+        </label>
+
+        <div class="checks">
+          <label><input type="checkbox" id="f-destacado"> Destacado en la portada</label>
+          <label><input type="checkbox" id="f-visible" checked> Visible en la web</label>
+        </div>
+
+        <p class="form-error" id="f-error" role="alert" hidden></p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" data-close>Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="f-submit">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===========================================================
+       MODAL: añadir varias piezas de diseño de golpe
+       Una ruta por línea; todas comparten tipo, pack y visibilidad.
+       =========================================================== -->
+  <div class="modal" id="modal-bulk" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-bulk-title">
+      <h2 id="modal-bulk-title">Añadir varias piezas de diseño</h2>
+      <form id="bulk-form" novalidate>
+        <label class="field">
+          <span>Rutas de las imágenes <em>(una por línea)</em></span>
+          <textarea id="b-rutas" rows="6" placeholder="assets/logos/logo-01.jpg&#10;assets/logos/logo-02.jpg" spellcheck="false"></textarea>
+          <small>El título de cada pieza se genera a partir del nombre del archivo; luego puedes editarlo.</small>
+        </label>
+        <div class="field-row">
+          <label class="field">
+            <span>Tipo</span>
+            <select id="b-tipo"></select>
+          </label>
+          <label class="field">
+            <span>Pack <em>(opcional)</em></span>
+            <input type="text" id="b-pack" list="packs-list" maxlength="80" autocomplete="off">
+          </label>
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" id="b-visible" checked> Visibles en la web</label>
+        </div>
+        <p class="form-error" id="b-error" role="alert" hidden></p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" data-close>Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="b-submit">Crear piezas</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===========================================================
+       MODAL: gestionar los tipos de diseño (pestañas de la página Diseño)
+       =========================================================== -->
+  <div class="modal" id="modal-tipos" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-tipos-title">
+      <h2 id="modal-tipos-title">Tipos de diseño</h2>
+      <p class="muted">Cada tipo es una pestaña en la página Diseño. La proporción y el fondo definen cómo se ve la imagen en su tarjeta.</p>
+      <form id="tipos-form" novalidate>
+        <ul class="tipos-list" id="tipos-list"></ul>
+        <button type="button" class="btn" id="btn-add-tipo">Añadir tipo</button>
+        <p class="form-error" id="t-error" role="alert" hidden></p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" data-close>Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="t-submit">Guardar tipos</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sugerencias para los campos de ruta y de pack -->
+  <datalist id="assets-list"></datalist>
+  <datalist id="packs-list"></datalist>
+
+  <!-- Mensajes breves (guardado, errores...) -->
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <!-- SDK de Firebase (con autenticación) → configuración → datos → panel -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="data.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

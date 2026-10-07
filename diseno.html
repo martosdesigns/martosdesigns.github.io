@@ -72,104 +72,19 @@
     </div>
 
     <!-- ===========================================================
-         LOGOS
+         PIEZAS DE DISEÑO
+         render.js rellena el contenedor #diseno-app con:
+           - una fila de pestañas: Todo · Packs · un tipo por categoría
+             (Logos, Overlays, Miniaturas... los tipos se gestionan desde
+             el panel de administración y solo aparecen si tienen piezas)
+           - la rejilla de tarjetas de la pestaña activa
+         Se puede enlazar a una pestaña concreta: diseno.html#logo
+         Al pulsar una pieza se abre el visor ampliado (lightbox); si
+         pertenece a un pack, el visor recorre todo el pack.
          =========================================================== -->
     <section class="section-light">
       <div class="wrap">
-        <div class="subgroup-label">
-          <span>Logos</span>
-          <span class="sg-line"></span>
-          <div class="car-controls">
-            <button class="car-btn" data-target="car-logos" data-dir="-1" aria-label="Anterior">‹</button>
-            <button class="car-btn" data-target="car-logos" data-dir="1" aria-label="Siguiente">›</button>
-          </div>
-        </div>
-        <div class="carousel" id="car-logos">
-          <div class="ph ph-square carousel-item carousel-item--square"><span class="ph-tag">LOGO 01</span>Sustituye por tu imagen</div>
-          <div class="ph ph-square carousel-item carousel-item--square"><span class="ph-tag">LOGO 02</span>Sustituye por tu imagen</div>
-          <div class="ph ph-square carousel-item carousel-item--square"><span class="ph-tag">LOGO 03</span>Sustituye por tu imagen</div>
-          <div class="ph ph-square carousel-item carousel-item--square"><span class="ph-tag">LOGO 04</span>Sustituye por tu imagen</div>
-          <div class="ph ph-square carousel-item carousel-item--square"><span class="ph-tag">LOGO 05</span>Sustituye por tu imagen</div>
-          <div class="ph ph-square carousel-item carousel-item--square"><span class="ph-tag">LOGO 06</span>Sustituye por tu imagen</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===========================================================
-         OVERLAYS
-         =========================================================== -->
-    <section class="section-dark">
-      <div class="wrap">
-        <div class="subgroup-label" style="margin-top:0;">
-          <span>Overlays</span>
-          <span class="sg-line"></span>
-          <div class="car-controls">
-            <button class="car-btn" data-target="car-overlays" data-dir="-1" aria-label="Anterior">‹</button>
-            <button class="car-btn" data-target="car-overlays" data-dir="1" aria-label="Siguiente">›</button>
-          </div>
-        </div>
-        <div class="carousel" id="car-overlays">
-          <div class="ph ph-video carousel-item carousel-item--video"><span class="ph-tag">OVERLAY 01</span>Captura de tu overlay</div>
-          <div class="ph ph-video carousel-item carousel-item--video"><span class="ph-tag">OVERLAY 02</span>Captura de tu overlay</div>
-          <div class="ph ph-video carousel-item carousel-item--video"><span class="ph-tag">OVERLAY 03</span>Captura de tu overlay</div>
-          <div class="ph ph-video carousel-item carousel-item--video"><span class="ph-tag">OVERLAY 04</span>Captura de tu overlay</div>
-          <div class="ph ph-video carousel-item carousel-item--video"><span class="ph-tag">OVERLAY 05</span>Captura de tu overlay</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===========================================================
-         MINIATURAS YOUTUBE
-         El primer elemento es una "tarjeta de grupo": varias miniaturas
-         del mismo vídeo agrupadas en un mosaico, que al hacer clic abren
-         el visor ampliado (lightbox). Ver la clase .group-grid en
-         styles.css y la función initLightbox() en script.js.
-
-         Para añadir otro grupo, basta con repetir este mismo patrón
-         cambiando data-lightbox-group por un nombre nuevo.
-         =========================================================== -->
-    <section class="section-light">
-      <div class="wrap">
-        <div class="subgroup-label" style="margin-top:0;">
-          <span>Miniaturas YouTube</span>
-          <span class="sg-line"></span>
-          <div class="car-controls">
-            <button class="car-btn" data-target="car-thumbs" data-dir="-1" aria-label="Anterior">‹</button>
-            <button class="car-btn" data-target="car-thumbs" data-dir="1" aria-label="Siguiente">›</button>
-          </div>
-        </div>
-        <div class="carousel" id="car-thumbs">
-
-          <!-- Tarjeta de grupo: 4 miniaturas del mismo VLOG -->
-          <div class="group-card carousel-item carousel-item--video">
-            <div class="group-grid">
-              <button type="button" data-lightbox-group="japon" data-src="assets/video/vlog-japon-1.jpg" data-caption="VLOG en Japón #1 — La llegada">
-                <img src="assets/video/vlog-japon-1.jpg" alt="Miniatura VLOG en Japón #1">
-              </button>
-              <button type="button" data-lightbox-group="japon" data-src="" data-caption="VLOG en Japón #2">
-                <div class="ph ph-video" style="border:none; border-radius:0; aspect-ratio:auto; height:100%;">Sube la miniatura #2</div>
-              </button>
-              <button type="button" data-lightbox-group="japon" data-src="" data-caption="VLOG en Japón #3">
-                <div class="ph ph-video" style="border:none; border-radius:0; aspect-ratio:auto; height:100%;">Sube la miniatura #3</div>
-              </button>
-              <button type="button" data-lightbox-group="japon" data-src="" data-caption="VLOG en Japón #4">
-                <div class="ph ph-video" style="border:none; border-radius:0; aspect-ratio:auto; height:100%;">
-                  <span class="more-tag">+1 más</span>
-                </div>
-              </button>
-            </div>
-            <div class="card-body">
-              <div class="card-title">VLOG en Japón — Miniaturas</div>
-              <div class="card-sub">4 versiones · haz clic para ampliar</div>
-            </div>
-          </div>
-
-          <!-- Miniaturas sueltas (sin agrupar) -->
-          <div class="ph ph-video carousel-item carousel-item--video"><span class="ph-tag">THUMB 02</span>Miniatura del vídeo</div>
-          <div class="ph ph-video carousel-item carousel-item--video"><span class="ph-tag">THUMB 03</span>Miniatura del vídeo</div>
-          <div class="ph ph-video carousel-item carousel-item--video"><span class="ph-tag">THUMB 04</span>Miniatura del vídeo</div>
-          <div class="ph ph-video carousel-item carousel-item--video"><span class="ph-tag">THUMB 05</span>Miniatura del vídeo</div>
-        </div>
+        <div id="diseno-app"></div>
       </div>
     </section>
 
@@ -177,6 +92,13 @@
 
   <footer>© 2026 Eric Martos — martos.designs</footer>
 
+  <!-- Contenido dinámico: SDK de Firebase → configuración → datos → pintado.
+       Después, script.js activa el comportamiento (animaciones, visor...). -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="data.js"></script>
+  <script src="render.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

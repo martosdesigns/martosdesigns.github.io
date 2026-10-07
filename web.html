@@ -57,16 +57,17 @@
       <div class="wrap">
         <div class="eyebrow">03 — Web</div>
         <h1>Desarrollo Web</h1>
-        <p class="sec-desc">Proyectos construidos con HTML, CSS y JavaScript. Añade captura, stack y enlace en vivo de cada uno.</p>
+        <p class="sec-desc">Proyectos construidos con HTML, CSS y JavaScript.</p>
       </div>
     </div>
 
     <!-- ===========================================================
          PROYECTOS
-         El bloque "code-frame" de arriba es solo decorativo (un
+         El bloque "code-frame" de abajo es solo decorativo (un
          fragmento de código de ejemplo, no ejecuta nada real).
-         Cada tarjeta simula la barra de un navegador sobre la
-         captura del proyecto.
+         Las tarjetas las pinta render.js con los proyectos que das de
+         alta en el panel de administración (sección Web): captura,
+         etiquetas y enlace en vivo, bajo una barra de navegador simulada.
          =========================================================== -->
     <section class="section-light">
       <div class="wrap">
@@ -95,56 +96,7 @@
           </div>
         </div>
 
-        <div class="carousel" id="car-web">
-          <div class="card carousel-item carousel-item--card">
-            <div class="browser"><span></span><span></span><span></span></div>
-            <div class="ph ph-video" style="border-top:none; border-radius:0;">
-              <span class="ph-tag">WEB 01</span>Captura del sitio
-            </div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Breve descripción del proyecto</div>
-              <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JS</span></div>
-              <a class="link-arrow" href="#">Ver en vivo <span>→</span></a>
-            </div>
-          </div>
-          <div class="card carousel-item carousel-item--card">
-            <div class="browser"><span></span><span></span><span></span></div>
-            <div class="ph ph-video" style="border-top:none; border-radius:0;">
-              <span class="ph-tag">WEB 02</span>Captura del sitio
-            </div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Breve descripción del proyecto</div>
-              <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JS</span></div>
-              <a class="link-arrow" href="#">Ver en vivo <span>→</span></a>
-            </div>
-          </div>
-          <div class="card carousel-item carousel-item--card">
-            <div class="browser"><span></span><span></span><span></span></div>
-            <div class="ph ph-video" style="border-top:none; border-radius:0;">
-              <span class="ph-tag">WEB 03</span>Captura del sitio
-            </div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Breve descripción del proyecto</div>
-              <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JS</span></div>
-              <a class="link-arrow" href="#">Ver en vivo <span>→</span></a>
-            </div>
-          </div>
-          <div class="card carousel-item carousel-item--card">
-            <div class="browser"><span></span><span></span><span></span></div>
-            <div class="ph ph-video" style="border-top:none; border-radius:0;">
-              <span class="ph-tag">WEB 04</span>Captura del sitio
-            </div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Breve descripción del proyecto</div>
-              <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JS</span></div>
-              <a class="link-arrow" href="#">Ver en vivo <span>→</span></a>
-            </div>
-          </div>
-        </div>
+        <div class="carousel" id="car-web" data-render="web"></div>
       </div>
     </section>
 
@@ -152,6 +104,13 @@
 
   <footer>© 2026 Eric Martos — martos.designs</footer>
 
+  <!-- Contenido dinámico: SDK de Firebase → configuración → datos → pintado.
+       Después, script.js activa el comportamiento (carruseles, animaciones...). -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="data.js"></script>
+  <script src="render.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

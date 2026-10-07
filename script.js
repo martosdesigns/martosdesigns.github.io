@@ -5,6 +5,10 @@
  * video, web, sobre-mi, contacto). No usa frameworks ni build
  * step: es JavaScript plano, pensado para poder editarse a mano.
  *
+ * El contenido de proyectos (tarjetas, pestañas...) lo construye
+ * render.js a partir de los datos de Firebase; este archivo se
+ * ocupa del comportamiento: menú, carruseles, animaciones y visor.
+ *
  * Índice de funciones:
  *   1. highlightCurrentNavLink()  → marca la página activa en el menú
  *   2. initCarousels()            → flechas de los carruseles horizontales
@@ -13,7 +17,8 @@
  *   5. initScrollReveal()         → animaciones de aparición al hacer scroll
  *   6. initPageTransitions()      → fundido al navegar entre páginas
  *   7. initHeroParallax()         → paralaje del titular en el Inicio
- *   8. initLightbox()             → visor ampliado para grupos de imágenes
+ *   8. initLightbox()             → visor ampliado: define window.openLightbox()
+ *   9. waitForContent()           → espera a que render.js pinte los proyectos
  *
  * Todas las funciones son independientes entre sí: si una página
  * no tiene el elemento correspondiente, la función simplemente no
@@ -38,10 +43,11 @@ function highlightCurrentNavLink() {
 }
 
 /**
- * 2. Da vida a los carruseles horizontales (Logos, Overlays, Vídeo, Web...).
+ * 2. Da vida a los carruseles horizontales (Vídeo, Web, portada...).
  *    Cada carrusel tiene dos botones (data-dir="-1" / "1") que hacen scroll
  *    una "página" de tarjetas hacia atrás o hacia delante, y se desactivan
- *    solos al llegar al principio o al final.
+ *    solos al llegar al principio o al final. Como las tarjetas se pintan
+ *    desde los datos, también se recalculan si el contenido cambia.
  */
 function initCarousels() {
   document.querySelectorAll('.carousel').forEach((carousel) => {
@@ -72,6 +78,7 @@ function initCarousels() {
 
     carousel.addEventListener('scroll', refreshArrowStates, { passive: true });
     window.addEventListener('resize', refreshArrowStates);
+    new MutationObserver(refreshArrowStates).observe(carousel, { childList: true });
     refreshArrowStates();
   });
 }
@@ -127,10 +134,13 @@ function initCopyEmailButton() {
  *    - .reveal-item → fundido + ligera escala (tarjetas, títulos de sección)
  *    - .reveal-blur → fundido + desenfoque + ascenso (cabeceras de página,
  *      un efecto más "cinematográfico" reservado para los titulares grandes)
+ *
+ *    Las tarjetas de la rejilla de Diseño (.piece-card) no pasan por aquí:
+ *    se vuelven a pintar al cambiar de pestaña y tienen su propia animación.
  */
 function initScrollReveal() {
   const SCALE_FADE_SELECTORS = [
-    '.sec-head', '.card', '.tile', '.subgroup-label', '.carousel-item',
+    '.sec-head', '.card', '.tile', '.subgroup-label', '.tabs',
     '.photo-ph', '.about-bio p', '.terminal', '.code-frame',
     '.contact-card', '.copy-btn', '.tc-strip',
   ].join(', ');
@@ -230,38 +240,21 @@ function initHeroParallax() {
 }
 
 /**
- * 8. Visor de imágenes ampliadas para "tarjetas de grupo" (ej. varias
- *    miniaturas del mismo proyecto). Cualquier <button> con el atributo
- *    data-lightbox-group="nombre-del-grupo" se agrupa automáticamente con
- *    los demás botones que compartan ese mismo nombre; al hacer clic se
- *    abre un visor a pantalla completa con flechas para pasar solo entre
- *    las imágenes de ese grupo.
+ * 8. Visor de imágenes ampliadas. Define window.openLightbox(items, start),
+ *    que render.js llama al pulsar una pieza de diseño o un pack:
+ *      items → lista de { src, caption } (las imágenes del pack, o una sola)
+ *      start → posición de la imagen con la que abrir
  *
- *    Atributos que lee cada botón disparador:
- *      data-lightbox-group  → nombre del grupo (obligatorio)
- *      data-src             → imagen a mostrar en grande (obligatorio)
- *      data-caption         → texto opcional bajo la imagen
+ *    El overlay se construye una sola vez y se reutiliza. Se cierra con la
+ *    X, con clic fuera de la imagen o con Escape, y se navega con las
+ *    flechas del visor o del teclado (si solo hay una imagen se ocultan).
  */
 function initLightbox() {
-  const triggers = document.querySelectorAll('[data-lightbox-group]');
-  if (!triggers.length) return;
-
-  // Agrupa los botones por nombre de grupo y guarda a cada uno su posición
-  // dentro del grupo (para poder abrir el visor justo en esa imagen).
-  const groups = {};
-  triggers.forEach((btn) => {
-    const groupName = btn.dataset.lightboxGroup;
-    groups[groupName] ??= [];
-    groups[groupName].push({
-      src: btn.dataset.src,
-      caption: btn.dataset.caption || '',
-    });
-    btn.dataset.groupIndex = groups[groupName].length - 1;
-  });
-
-  // Construye el overlay una sola vez y lo reutiliza para todos los grupos.
   const overlay = document.createElement('div');
   overlay.className = 'lightbox-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', 'Visor de imágenes');
   overlay.innerHTML = `
     <button class="lightbox-close" aria-label="Cerrar">✕</button>
     <button class="lightbox-prev" aria-label="Anterior">‹</button>
@@ -273,45 +266,46 @@ function initLightbox() {
 
   const imageEl = overlay.querySelector('.lightbox-img');
   const captionEl = overlay.querySelector('.lightbox-caption');
+  const prevBtn = overlay.querySelector('.lightbox-prev');
+  const nextBtn = overlay.querySelector('.lightbox-next');
 
-  let activeGroup = null;
-  let activeIndex = 0;
+  let currentItems = [];
+  let currentIndex = 0;
 
   const renderCurrentImage = () => {
-    const item = groups[activeGroup][activeIndex];
+    const item = currentItems[currentIndex];
     imageEl.src = item.src;
-    imageEl.alt = item.caption;
-    captionEl.textContent = item.caption;
-  };
-
-  const openLightbox = (groupName, startIndex) => {
-    activeGroup = groupName;
-    activeIndex = startIndex;
-    renderCurrentImage();
-    overlay.classList.add('open');
+    imageEl.alt = item.caption || '';
+    const counter = currentItems.length > 1 ? `  ·  ${currentIndex + 1} / ${currentItems.length}` : '';
+    captionEl.textContent = (item.caption || '') + counter;
   };
 
   const closeLightbox = () => overlay.classList.remove('open');
 
   const showNextImage = () => {
-    activeIndex = (activeIndex + 1) % groups[activeGroup].length;
+    currentIndex = (currentIndex + 1) % currentItems.length;
     renderCurrentImage();
   };
 
   const showPreviousImage = () => {
-    activeIndex = (activeIndex - 1 + groups[activeGroup].length) % groups[activeGroup].length;
+    currentIndex = (currentIndex - 1 + currentItems.length) % currentItems.length;
     renderCurrentImage();
   };
 
-  triggers.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      openLightbox(btn.dataset.lightboxGroup, parseInt(btn.dataset.groupIndex, 10));
-    });
-  });
+  window.openLightbox = (items, startIndex = 0) => {
+    if (!items || !items.length) return;
+    currentItems = items;
+    currentIndex = Math.min(Math.max(startIndex, 0), items.length - 1);
+    const hasSeveral = items.length > 1;
+    prevBtn.hidden = !hasSeveral;
+    nextBtn.hidden = !hasSeveral;
+    renderCurrentImage();
+    overlay.classList.add('open');
+  };
 
   overlay.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
-  overlay.querySelector('.lightbox-next').addEventListener('click', showNextImage);
-  overlay.querySelector('.lightbox-prev').addEventListener('click', showPreviousImage);
+  nextBtn.addEventListener('click', showNextImage);
+  prevBtn.addEventListener('click', showPreviousImage);
 
   // Cierra al hacer clic fuera de la imagen (sobre el fondo oscuro)
   overlay.addEventListener('click', (event) => {
@@ -322,26 +316,51 @@ function initLightbox() {
   document.addEventListener('keydown', (event) => {
     if (!overlay.classList.contains('open')) return;
     if (event.key === 'Escape') closeLightbox();
-    if (event.key === 'ArrowRight') showNextImage();
-    if (event.key === 'ArrowLeft') showPreviousImage();
+    if (event.key === 'ArrowRight' && currentItems.length > 1) showNextImage();
+    if (event.key === 'ArrowLeft' && currentItems.length > 1) showPreviousImage();
   });
+}
+
+/**
+ * 9. Espera a que render.js pinte los proyectos de la página (si la página
+ *    tiene alguno), con un límite de tiempo para no dejar la pantalla en
+ *    blanco si la conexión con la base de datos va lenta. Pasado ese
+ *    límite se muestra la página igualmente y el contenido aparece al
+ *    llegar (los carruseles se recalculan solos al recibirlo).
+ */
+async function waitForContent() {
+  if (!window.PortfolioRender) return;
+  const MAX_WAIT = 2000; // ms
+  const timeout = new Promise((resolve) => setTimeout(resolve, MAX_WAIT));
+  try {
+    await Promise.race([window.PortfolioRender.renderAll(), timeout]);
+  } catch (error) {
+    console.error('Error al pintar el contenido:', error);
+  }
 }
 
 // -------------------------------------------------------------
 // Punto de entrada: se ejecuta en cuanto el HTML está listo.
 // -------------------------------------------------------------
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   document.body.classList.add('js-ready'); // activa las animaciones CSS que dependen de JS
 
+  // Comportamientos que no dependen del contenido dinámico
   highlightCurrentNavLink();
-  initCarousels();
   initMobileMenu();
   initCopyEmailButton();
-  initScrollReveal();
   initPageTransitions();
-  initHeroParallax();
   initLightbox();
 
-  // Fundido de entrada: revela la página una vez todo está preparado.
-  requestAnimationFrame(() => document.body.classList.add('page-ready'));
+  try {
+    // Los proyectos se pintan desde la base de datos; el resto de
+    // comportamientos se activan cuando ya existen las tarjetas.
+    await waitForContent();
+    initCarousels();
+    initScrollReveal();
+    initHeroParallax();
+  } finally {
+    // Fundido de entrada: pase lo que pase, la página siempre se acaba mostrando.
+    requestAnimationFrame(() => document.body.classList.add('page-ready'));
+  }
 });

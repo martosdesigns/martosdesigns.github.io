@@ -156,8 +156,9 @@
 
     <!-- ===========================================================
          DESTACADOS Y ÚLTIMOS TRABAJOS
-         Dos carruseles horizontales; cada tarjeta es un placeholder
-         listo para sustituir por un proyecto real (ver ph-tag).
+         Dos carruseles que rellena render.js desde el panel de
+         administración: "Destacados" muestra las piezas marcadas con
+         la estrella y "Últimos trabajos" las 8 más recientes.
          =========================================================== -->
     <section id="destacados" class="section-dark">
       <div class="wrap">
@@ -175,48 +176,7 @@
             <button class="car-btn" data-target="car-destacados" data-dir="1" aria-label="Siguiente">›</button>
           </div>
         </div>
-        <div class="carousel" id="car-destacados">
-          <div class="card carousel-item carousel-item--card">
-            <div class="ph ph-video">
-              <span class="ph-tag">DESTACADO 01</span>
-              Sustituye por tu proyecto
-            </div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Categoría — Diseño / Vídeo / Web</div>
-            </div>
-          </div>
-          <div class="card carousel-item carousel-item--card">
-            <div class="ph ph-video">
-              <span class="ph-tag">DESTACADO 02</span>
-              Sustituye por tu proyecto
-            </div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Categoría — Diseño / Vídeo / Web</div>
-            </div>
-          </div>
-          <div class="card carousel-item carousel-item--card">
-            <div class="ph ph-video">
-              <span class="ph-tag">DESTACADO 03</span>
-              Sustituye por tu proyecto
-            </div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Categoría — Diseño / Vídeo / Web</div>
-            </div>
-          </div>
-          <div class="card carousel-item carousel-item--card">
-            <div class="ph ph-video">
-              <span class="ph-tag">DESTACADO 04</span>
-              Sustituye por tu proyecto
-            </div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Categoría — Diseño / Vídeo / Web</div>
-            </div>
-          </div>
-        </div>
+        <div class="carousel" id="car-destacados" data-render="destacados"></div>
 
         <div class="subgroup-label">
           <span>Últimos trabajos</span>
@@ -226,36 +186,7 @@
             <button class="car-btn" data-target="car-ultimos" data-dir="1" aria-label="Siguiente">›</button>
           </div>
         </div>
-        <div class="carousel" id="car-ultimos">
-          <div class="card carousel-item carousel-item--card">
-            <div class="ph ph-video"><span class="ph-tag">ÚLTIMO 01</span></div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Fecha / cliente</div>
-            </div>
-          </div>
-          <div class="card carousel-item carousel-item--card">
-            <div class="ph ph-video"><span class="ph-tag">ÚLTIMO 02</span></div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Fecha / cliente</div>
-            </div>
-          </div>
-          <div class="card carousel-item carousel-item--card">
-            <div class="ph ph-video"><span class="ph-tag">ÚLTIMO 03</span></div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Fecha / cliente</div>
-            </div>
-          </div>
-          <div class="card carousel-item carousel-item--card">
-            <div class="ph ph-video"><span class="ph-tag">ÚLTIMO 04</span></div>
-            <div class="card-body">
-              <div class="card-title">Nombre del proyecto</div>
-              <div class="card-sub">Fecha / cliente</div>
-            </div>
-          </div>
-        </div>
+        <div class="carousel" id="car-ultimos" data-render="ultimos"></div>
       </div>
     </section>
 
@@ -263,6 +194,13 @@
 
   <footer>© 2026 Eric Martos — martos.designs</footer>
 
+  <!-- Contenido dinámico: SDK de Firebase → configuración → datos → pintado.
+       Después, script.js activa el comportamiento (carruseles, animaciones...). -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="data.js"></script>
+  <script src="render.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
