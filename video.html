@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vídeo — Eric Martos</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* Color de acento propio de esta página: ámbar, en referencia
+       al visor de exposición de una cámara/moviola */
+    :root{ --accent2:#E3B15B; }
+  </style>
+</head>
+<body>
+
+  <!-- Barra de navegación — idéntica en las 6 páginas, ver comentario en index.html -->
+  <header class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="index.html">
+        <span class="nav-logo-chip"><img src="assets/logo.png" alt="Martos Designs"></span>
+      </a>
+      <nav class="nav-links">
+        <a class="nav-item" href="index.html">Inicio</a>
+        <a class="nav-item" href="diseno.html">Diseño</a>
+        <a class="nav-item" href="video.html">Vídeo</a>
+        <a class="nav-item" href="web.html">Web</a>
+        <a class="nav-item" href="sobre-mi.html">Sobre mí</a>
+        <a class="nav-item" href="contacto.html">Contacto</a>
+      </nav>
+      <button class="nav-burger" id="burger" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile" id="mobile-panel">
+      <a href="index.html">Inicio</a>
+      <a href="diseno.html">Diseño</a>
+      <a href="video.html">Vídeo</a>
+      <a href="web.html">Web</a>
+      <a href="sobre-mi.html">Sobre mí</a>
+      <a href="contacto.html">Contacto</a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===========================================================
+         CABECERA
+         =========================================================== -->
+    <div class="page-hero section-dark">
+      <div class="ambient-glow" aria-hidden="true"></div>
+      <div class="wrap">
+        <div class="eyebrow">02 — Vídeo</div>
+        <h1>Edición de Vídeo</h1>
+        <p class="sec-desc">Montaje, motion graphics y color. Sustituye cada placeholder por tu clip o enlace de YouTube/Vimeo.</p>
+      </div>
+    </div>
+
+    <!-- ===========================================================
+         PROYECTOS
+         La tira de timecodes (.tc-strip) es solo decorativa, un guiño
+         a la identidad de editor de vídeo — no representa nada real.
+
+         La primera tarjeta ya tiene un proyecto real: enlaza al vídeo
+         de YouTube y usa la miniatura propia como portada, en vez del
+         hueco de placeholder gris. El resto siguen pendientes de
+         sustituir (ver el patrón "ph ph-video" + "ph-tag").
+         =========================================================== -->
+    <section class="section-light">
+      <div class="wrap">
+
+        <div class="tc-strip">
+          <span>00:00</span><span>00:15</span><span>00:30</span><span>00:45</span><span>01:00</span><span>01:15</span>
+        </div>
+
+        <div class="subgroup-label" style="margin-top:0;">
+          <span>Proyectos</span>
+          <span class="sg-line"></span>
+          <div class="car-controls">
+            <button class="car-btn" data-target="car-clips" data-dir="-1" aria-label="Anterior">‹</button>
+            <button class="car-btn" data-target="car-clips" data-dir="1" aria-label="Siguiente">›</button>
+          </div>
+        </div>
+
+        <div class="carousel" id="car-clips">
+
+          <!-- Proyecto real: VLOG en Japón #1 (enlaza a YouTube) -->
+          <div class="card carousel-item carousel-item--card">
+            <a
+              href="https://www.youtube.com/watch?v=3Z7yGwcP_nc&t=163s"
+              target="_blank" rel="noopener"
+              class="ph ph-video"
+              style="border:none; padding:0; display:block;"
+            >
+              <img src="assets/video/vlog-japon-1.jpg" alt="VLOG en JAPÓN #1 — La llegada" style="width:100%; height:100%; object-fit:cover;">
+              <div class="playbtn" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);"></div>
+            </a>
+            <div class="card-body">
+              <div class="card-title">VLOG en JAPÓN #1</div>
+              <div class="card-sub">Personal</div>
+            </div>
+          </div>
+
+          <!-- Placeholders pendientes de sustituir -->
+          <div class="card carousel-item carousel-item--card">
+            <div class="ph ph-video"><span class="ph-tag">CLIP 02</span><div class="playbtn"></div></div>
+            <div class="card-body">
+              <div class="card-title">Nombre del proyecto</div>
+              <div class="card-sub">Tipo de trabajo — cliente / marca</div>
+            </div>
+          </div>
+          <div class="card carousel-item carousel-item--card">
+            <div class="ph ph-video"><span class="ph-tag">CLIP 03</span><div class="playbtn"></div></div>
+            <div class="card-body">
+              <div class="card-title">Nombre del proyecto</div>
+              <div class="card-sub">Tipo de trabajo — cliente / marca</div>
+            </div>
+          </div>
+          <div class="card carousel-item carousel-item--card">
+            <div class="ph ph-video"><span class="ph-tag">CLIP 04</span><div class="playbtn"></div></div>
+            <div class="card-body">
+              <div class="card-title">Nombre del proyecto</div>
+              <div class="card-sub">Tipo de trabajo — cliente / marca</div>
+            </div>
+          </div>
+          <div class="card carousel-item carousel-item--card">
+            <div class="ph ph-video"><span class="ph-tag">CLIP 05</span><div class="playbtn"></div></div>
+            <div class="card-body">
+              <div class="card-title">Nombre del proyecto</div>
+              <div class="card-sub">Tipo de trabajo — cliente / marca</div>
+            </div>
+          </div>
+          <div class="card carousel-item carousel-item--card">
+            <div class="ph ph-video"><span class="ph-tag">CLIP 06</span><div class="playbtn"></div></div>
+            <div class="card-body">
+              <div class="card-title">Nombre del proyecto</div>
+              <div class="card-sub">Tipo de trabajo — cliente / marca</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>© 2026 Eric Martos — martos.designs</footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

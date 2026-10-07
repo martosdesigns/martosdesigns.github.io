@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web — Eric Martos</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* Color de acento propio de esta página: verde azulado, en
+       referencia a una terminal/editor de código */
+    :root{ --accent2:#4FA396; }
+  </style>
+</head>
+<body>
+
+  <!-- Barra de navegación — idéntica en las 6 páginas, ver comentario en index.html -->
+  <header class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="index.html">
+        <span class="nav-logo-chip"><img src="assets/logo.png" alt="Martos Designs"></span>
+      </a>
+      <nav class="nav-links">
+        <a class="nav-item" href="index.html">Inicio</a>
+        <a class="nav-item" href="diseno.html">Diseño</a>
+        <a class="nav-item" href="video.html">Vídeo</a>
+        <a class="nav-item" href="web.html">Web</a>
+        <a class="nav-item" href="sobre-mi.html">Sobre mí</a>
+        <a class="nav-item" href="contacto.html">Contacto</a>
+      </nav>
+      <button class="nav-burger" id="burger" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile" id="mobile-panel">
+      <a href="index.html">Inicio</a>
+      <a href="diseno.html">Diseño</a>
+      <a href="video.html">Vídeo</a>
+      <a href="web.html">Web</a>
+      <a href="sobre-mi.html">Sobre mí</a>
+      <a href="contacto.html">Contacto</a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===========================================================
+         CABECERA
+         =========================================================== -->
+    <div class="page-hero section-dark">
+      <div class="ambient-glow" aria-hidden="true"></div>
+      <div class="wrap">
+        <div class="eyebrow">03 — Web</div>
+        <h1>Desarrollo Web</h1>
+        <p class="sec-desc">Proyectos construidos con HTML, CSS y JavaScript. Añade captura, stack y enlace en vivo de cada uno.</p>
+      </div>
+    </div>
+
+    <!-- ===========================================================
+         PROYECTOS
+         El bloque "code-frame" de arriba es solo decorativo (un
+         fragmento de código de ejemplo, no ejecuta nada real).
+         Cada tarjeta simula la barra de un navegador sobre la
+         captura del proyecto.
+         =========================================================== -->
+    <section class="section-light">
+      <div class="wrap">
+
+        <div class="code-frame">
+          <div class="cf-bar">
+            <span></span><span></span><span></span>
+            <small>portfolio.js</small>
+          </div>
+          <div class="cf-body">
+            <div class="cf-lines">1<br>2<br>3</div>
+            <div class="cf-code">
+              <span class="kw">const</span> stack = [<b>'HTML'</b>, <b>'CSS'</b>, <b>'JavaScript'</b>];<br>
+              <span class="kw">function</span> build(idea) { <span class="kw">return</span> idea.toCode(); }<br>
+              build(proyecto).deploy();
+            </div>
+          </div>
+        </div>
+
+        <div class="subgroup-label" style="margin-top:0;">
+          <span>Proyectos</span>
+          <span class="sg-line"></span>
+          <div class="car-controls">
+            <button class="car-btn" data-target="car-web" data-dir="-1" aria-label="Anterior">‹</button>
+            <button class="car-btn" data-target="car-web" data-dir="1" aria-label="Siguiente">›</button>
+          </div>
+        </div>
+
+        <div class="carousel" id="car-web">
+          <div class="card carousel-item carousel-item--card">
+            <div class="browser"><span></span><span></span><span></span></div>
+            <div class="ph ph-video" style="border-top:none; border-radius:0;">
+              <span class="ph-tag">WEB 01</span>Captura del sitio
+            </div>
+            <div class="card-body">
+              <div class="card-title">Nombre del proyecto</div>
+              <div class="card-sub">Breve descripción del proyecto</div>
+              <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JS</span></div>
+              <a class="link-arrow" href="#">Ver en vivo <span>→</span></a>
+            </div>
+          </div>
+          <div class="card carousel-item carousel-item--card">
+            <div class="browser"><span></span><span></span><span></span></div>
+            <div class="ph ph-video" style="border-top:none; border-radius:0;">
+              <span class="ph-tag">WEB 02</span>Captura del sitio
+            </div>
+            <div class="card-body">
+              <div class="card-title">Nombre del proyecto</div>
+              <div class="card-sub">Breve descripción del proyecto</div>
+              <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JS</span></div>
+              <a class="link-arrow" href="#">Ver en vivo <span>→</span></a>
+            </div>
+          </div>
+          <div class="card carousel-item carousel-item--card">
+            <div class="browser"><span></span><span></span><span></span></div>
+            <div class="ph ph-video" style="border-top:none; border-radius:0;">
+              <span class="ph-tag">WEB 03</span>Captura del sitio
+            </div>
+            <div class="card-body">
+              <div class="card-title">Nombre del proyecto</div>
+              <div class="card-sub">Breve descripción del proyecto</div>
+              <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JS</span></div>
+              <a class="link-arrow" href="#">Ver en vivo <span>→</span></a>
+            </div>
+          </div>
+          <div class="card carousel-item carousel-item--card">
+            <div class="browser"><span></span><span></span><span></span></div>
+            <div class="ph ph-video" style="border-top:none; border-radius:0;">
+              <span class="ph-tag">WEB 04</span>Captura del sitio
+            </div>
+            <div class="card-body">
+              <div class="card-title">Nombre del proyecto</div>
+              <div class="card-sub">Breve descripción del proyecto</div>
+              <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JS</span></div>
+              <a class="link-arrow" href="#">Ver en vivo <span>→</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>© 2026 Eric Martos — martos.designs</footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

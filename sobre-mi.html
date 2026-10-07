@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sobre mí — Eric Martos</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+  <!-- Esta página no necesita ningún color de acento distinto:
+       usa el rojo de marca por defecto (--accent2 no se sobreescribe) -->
+</head>
+<body>
+
+  <!-- Barra de navegación — idéntica en las 6 páginas, ver comentario en index.html -->
+  <header class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="index.html">
+        <span class="nav-logo-chip"><img src="assets/logo.png" alt="Martos Designs"></span>
+      </a>
+      <nav class="nav-links">
+        <a class="nav-item" href="index.html">Inicio</a>
+        <a class="nav-item" href="diseno.html">Diseño</a>
+        <a class="nav-item" href="video.html">Vídeo</a>
+        <a class="nav-item" href="web.html">Web</a>
+        <a class="nav-item" href="sobre-mi.html">Sobre mí</a>
+        <a class="nav-item" href="contacto.html">Contacto</a>
+      </nav>
+      <button class="nav-burger" id="burger" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile" id="mobile-panel">
+      <a href="index.html">Inicio</a>
+      <a href="diseno.html">Diseño</a>
+      <a href="video.html">Vídeo</a>
+      <a href="web.html">Web</a>
+      <a href="sobre-mi.html">Sobre mí</a>
+      <a href="contacto.html">Contacto</a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===========================================================
+         CABECERA
+         =========================================================== -->
+    <div class="page-hero section-dark">
+      <div class="ambient-glow" aria-hidden="true"></div>
+      <div class="wrap">
+        <div class="eyebrow">04 — Sobre mí</div>
+        <h1>Sobre mí</h1>
+      </div>
+    </div>
+
+    <!-- ===========================================================
+         FOTO + BIO + FICHA DE FORMACIÓN
+         =========================================================== -->
+    <section class="section-light">
+      <div class="wrap">
+
+        <div class="about-top">
+          <!-- Hueco para la foto de perfil (retrato, vertical) -->
+          <div class="ph photo-ph">
+            <span class="ph-tag">FOTO</span>
+            Sustituye por tu foto<br>(retrato, vertical)
+          </div>
+
+          <div class="about-bio">
+            <p class="lede">Un perfil técnico y creativo al servicio de cada proyecto.</p>
+            <p>Soy Eric Martos, creador multidisciplinar especializado en identidad visual, edición de vídeo y desarrollo web. Mi formación técnica en animación 3D, entornos interactivos y realidad aumentada me da una base sólida para entender cómo funciona una idea antes de darle forma.</p>
+            <p>Trabajo con el mismo rigor en Photoshop, After Effects o un editor de código, adaptando el proceso a lo que cada proyecto necesita — desde una pieza de marca hasta un producto digital completo.</p>
+          </div>
+        </div>
+
+        <!-- Ficha de formación y herramientas, con estética de terminal -->
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span></span><span></span><span></span>
+            <small>perfil.txt</small>
+          </div>
+          <div class="terminal-body">
+            <div class="t-head">Formación</div>
+            <ul>
+              <li>Técnico Superior en Animación 3D, Juegos y Entornos Interactivos</li>
+              <li>Mundos Virtuales, Realidad Aumentada y Gamificación</li>
+              <li>Técnicas de Interacción Digital y Multimedia</li>
+            </ul>
+            <div class="t-head">Herramientas</div>
+            <ul>
+              <li>Paquete Adobe (nivel alto)</li>
+              <li>CapCut</li>
+              <li>HTML / CSS / JavaScript</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>© 2026 Eric Martos — martos.designs</footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contacto — Eric Martos</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* Esta página no tiene .page-hero como las demás: el bloque de
+       contacto ocupa directamente la mayor parte de la pantalla */
+    #contact-section{
+      min-height:80vh; display:flex; align-items:center;
+      padding-top:56px; position:relative; overflow:hidden;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra de navegación — idéntica en las 6 páginas, ver comentario en index.html -->
+  <header class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="index.html">
+        <span class="nav-logo-chip"><img src="assets/logo.png" alt="Martos Designs"></span>
+      </a>
+      <nav class="nav-links">
+        <a class="nav-item" href="index.html">Inicio</a>
+        <a class="nav-item" href="diseno.html">Diseño</a>
+        <a class="nav-item" href="video.html">Vídeo</a>
+        <a class="nav-item" href="web.html">Web</a>
+        <a class="nav-item" href="sobre-mi.html">Sobre mí</a>
+        <a class="nav-item" href="contacto.html">Contacto</a>
+      </nav>
+      <button class="nav-burger" id="burger" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile" id="mobile-panel">
+      <a href="index.html">Inicio</a>
+      <a href="diseno.html">Diseño</a>
+      <a href="video.html">Vídeo</a>
+      <a href="web.html">Web</a>
+      <a href="sobre-mi.html">Sobre mí</a>
+      <a href="contacto.html">Contacto</a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===========================================================
+         CONTACTO — mensaje de invitación + dos tarjetas (Correo /
+         Instagram). El botón "Copiar correo" y el enlace de
+         Instagram están controlados por script.js.
+         =========================================================== -->
+    <section id="contact-section" class="section-dark">
+      <div class="ambient-glow" aria-hidden="true"></div>
+      <div class="wrap contact-block">
+        <div class="eyebrow">05 — Contacto</div>
+        <h2 style="margin:14px 0 16px; font-size:clamp(30px,4.6vw,50px);">Hablemos de tu proyecto</h2>
+        <p class="sec-desc" style="margin:0 auto;">Cuéntame qué tienes en mente — respondo en menos de 48 horas.</p>
+
+        <div class="contact-grid">
+          <div class="contact-card">
+            <div class="cc-label">Correo</div>
+            <!-- <wbr> marca dónde puede saltar de línea el email sin
+                 partir "gmail.com" por la mitad -->
+            <a class="cc-value" href="mailto:martosdesigns.art@gmail.com">martosdesigns.art@<wbr>gmail.com</a>
+            <button class="copy-btn" id="copy-email" type="button">Copiar correo</button>
+          </div>
+          <div class="contact-card">
+            <div class="cc-label">Instagram</div>
+            <a class="cc-value" href="https://instagram.com/martos.designs" target="_blank" rel="noopener">@martos.designs</a>
+            <span class="link-arrow">Abrir perfil <span>→</span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>© 2026 Eric Martos — martos.designs</footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
