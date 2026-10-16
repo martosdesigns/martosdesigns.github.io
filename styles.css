@@ -483,7 +483,8 @@ a.card, .card-media-link{ display:block; color:inherit; }
    render.js construye estas piezas a partir de los datos:
    una fila de pestañas (Todo / Packs / un tipo por categoría) y
    una rejilla de tarjetas. Un "pack" se muestra como una tarjeta
-   con mosaico de imágenes.
+   con mosaico de imágenes y, al pulsarla, se despliega debajo un
+   panel de ancho completo con todas sus piezas.
    =========================================================== */
 
 .tabs{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:36px; }
@@ -559,6 +560,45 @@ a.card, .card-media-link{ display:block; color:inherit; }
   background:rgba(0,0,0,0.55); color:#fff;
   font-family:'Inter', sans-serif; font-weight:700; font-size:15px;
 }
+
+/* Tarjeta de pack: título con una flecha que gira al desplegarse */
+.piece-title-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.pack-chevron{
+  flex-shrink:0; color:var(--accent2); font-size:14px; line-height:1;
+  transition:transform .3s cubic-bezier(.16,.84,.44,1);
+}
+.pack-card[aria-expanded="true"]{
+  border-color:var(--accent2);
+  box-shadow:0 0 0 1px var(--accent2), 0 24px 48px rgba(0,0,0,0.3);
+}
+.pack-card[aria-expanded="true"] .pack-chevron{ transform:rotate(180deg); }
+
+/* Panel desplegado: ocupa todo el ancho de la rejilla, bajo la fila del pack */
+.pack-expand{
+  grid-column:1 / -1;
+  background:var(--surface-2); border:1px solid var(--line-c-strong);
+  border-radius:22px; padding:22px;
+}
+.pack-expand.is-opening{ animation:pack-open .45s cubic-bezier(.16,.84,.44,1); }
+@keyframes pack-open{
+  from{ opacity:0; transform:translateY(-10px); }
+  to{ opacity:1; transform:none; }
+}
+@media (prefers-reduced-motion: reduce){ .pack-expand.is-opening{ animation:none; } }
+
+.pack-expand-head{
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:16px; margin-bottom:18px;
+}
+.pack-expand-title{ font-weight:700; font-size:18px; letter-spacing:-0.02em; color:var(--fg); }
+.pack-expand-sub{ font-size:13px; color:var(--fg-muted); margin-top:2px; }
+.pack-expand-close{
+  appearance:none; flex-shrink:0; width:34px; height:34px; border-radius:50%;
+  border:1px solid var(--line-c-strong); background:transparent; color:var(--fg-muted);
+  font-size:14px; line-height:1; cursor:pointer;
+  transition:color .2s ease, border-color .2s ease, transform .2s ease;
+}
+.pack-expand-close:hover{ color:var(--accent2); border-color:var(--accent2); transform:scale(1.08); }
 
 
 /* ===========================================================
