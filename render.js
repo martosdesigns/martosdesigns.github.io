@@ -99,6 +99,13 @@
     return wrapper;
   }
 
+  /**
+   * ¿La imagen debe verse entera (con margen) o rellenar toda la tarjeta?
+   * Los tipos cuadrados (carteles, "Otros"...) se ven enteros; los logos rellenan
+   * la tarjeta aunque se recorten un poco los bordes.
+   */
+  const verEntera = (tipo) => Boolean(tipo && tipo.aspecto === '1:1' && tipo.id !== 'logo');
+
   /** Agrupa las piezas de diseño por pack (el nombre se compara sin tildes ni mayúsculas). */
   function buildPacks(piezasDiseno) {
     const packs = new Map();
@@ -146,7 +153,7 @@
       mediaBlock(pieza, {
         aspecto: tipo ? tipo.aspecto : '16:9',
         fondo: tipo ? tipo.fondo : 'oscuro',
-        contain: tipo ? tipo.aspecto === '1:1' : false,
+        contain: verEntera(tipo),
       }),
       el('div', { class: 'piece-body' }, [
         el('div', { class: 'piece-title', title: pieza.titulo, text: pieza.titulo }),
@@ -533,7 +540,7 @@
     const subtitulo = [ETIQUETA_SECCION[pieza.seccion], tipo ? tipo.nombre : '', pieza.subtitulo].filter(Boolean).join(' · ');
     const media = mediaBlock(pieza, {
       fondo: tipo ? tipo.fondo : 'oscuro',
-      contain: Boolean(tipo && tipo.aspecto === '1:1'),
+      contain: verEntera(tipo),
       overlay: pieza.seccion === 'video' ? el('div', { class: 'playbtn' }) : null,
     });
     const body = cardBody({ titulo: pieza.titulo, subtitulo });
