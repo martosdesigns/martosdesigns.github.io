@@ -4,7 +4,8 @@
  * Lee las piezas (ver data.js) y construye el contenido de cada página.
  * Las páginas solo declaran DÓNDE va cada cosa; este archivo decide QUÉ:
  *
- *   #diseno-app                 → pestañas + rejilla de diseño (diseno.html)
+ *   #diseno-app                 → pestañas + rejilla de diseño (diseno.html);
+ *                                 los packs se ven como una tarjeta y se despliegan al pulsarlos
  *   [data-render="video"]       → carrusel de vídeos        (video.html)
  *   [data-render="web"]         → carrusel de proyectos web (web.html)
  *   [data-render="destacados"]  → piezas marcadas como destacadas (index.html)
@@ -125,14 +126,15 @@
   // Diseño: pestañas + rejilla
   // -----------------------------------------------------------
 
-  function piezaCard(pieza, ctx) {
+  function piezaCard(pieza, ctx, { ocultarPack = false } = {}) {
     const tipo = ctx.tiposById[pieza.tipo];
     const pack = ctx.packs.get(Data.slug(pieza.pack));
     const hayImagen = Boolean(pieza.ruta);
 
+    // Dentro de un pack ya desplegado la etiqueta "Pack · ..." sobra.
     const meta = [
       tipo ? el('span', { class: 'piece-type', text: tipo.nombre }) : null,
-      pack ? el('span', { class: 'pack-badge', text: `Pack · ${pack.nombre}` }) : null,
+      pack && !ocultarPack ? el('span', { class: 'pack-badge', text: `Pack · ${pack.nombre}` }) : null,
     ];
 
     return el('button', {
@@ -153,8 +155,19 @@
     ]);
   }
 
-  /** Tarjeta de pack: mosaico con las primeras imágenes y el recuento de piezas. */
-  function packCard(pack, ctx) {
+  /** Resumen de un pack: "3 piezas · Logos · Overlays". */
+  function resumenPack(pack, ctx) {
+    const nombresTipos = [...new Set(pack.piezas.map((p) => (ctx.tiposById[p.tipo] || {}).nombre).filter(Boolean))];
+    const recuento = pack.piezas.length === 1 ? '1 pieza' : `${pack.piezas.length} piezas`;
+    return [recuento, ...nombresTipos].join(' · ');
+  }
+
+  /**
+   * Tarjeta de pack: mosaico con las primeras imágenes y el recuento de piezas.
+   * Al pulsarla no abre el visor, sino que despliega el pack (ver renderDiseno).
+   * onToggle(tarjeta, pack) lo proporciona renderDiseno.
+   */
+  function packCard(pack, ctx, onToggle) {
     const visibles = pack.piezas.slice(0, 4);
     const resto = pack.piezas.length - visibles.length;
 
@@ -171,23 +184,64 @@
       return cell;
     });
 
-    const nombresTipos = [...new Set(pack.piezas.map((p) => (ctx.tiposById[p.tipo] || {}).nombre).filter(Boolean))];
-    const recuento = pack.piezas.length === 1 ? '1 pieza' : `${pack.piezas.length} piezas`;
-
-    return el('button', {
+    const resumen = resumenPack(pack, ctx);
+    const card = el('button', {
       type: 'button',
       class: 'piece-card pack-card',
-      'aria-label': `Abrir pack: ${pack.nombre}`,
-      onclick: () => openPieza(pack.piezas.find((p) => p.ruta) || pack.piezas[0], pack),
+      'aria-expanded': 'false',
+      'aria-label': `Pack ${pack.nombre}: ${resumen}. Pulsa para ver su contenido`,
+      onclick: () => onToggle(card, pack),
     }, [
       el('div', { class: 'piece-media aspect-16-9 mosaic', 'data-count': Math.min(visibles.length, 4) }, cells),
       el('div', { class: 'piece-body' }, [
-        el('div', { class: 'piece-title', text: pack.nombre }),
+        el('div', { class: 'piece-title-row' }, [
+          el('div', { class: 'piece-title', text: pack.nombre }),
+          el('span', { class: 'pack-chevron', 'aria-hidden': 'true', text: '▾' }),
+        ]),
         el('div', { class: 'piece-meta' }, [
-          el('span', { class: 'piece-type', text: [recuento, ...nombresTipos].join(' · ') }),
+          el('span', { class: 'piece-type', text: resumen }),
         ]),
       ]),
     ]);
+    return card;
+  }
+
+  /** Panel que se despliega bajo la fila de un pack, con todas sus piezas. */
+  function packPanel(pack, ctx, onClose) {
+    const cards = pack.piezas.map((pieza, index) => {
+      const card = piezaCard(pieza, ctx, { ocultarPack: true });
+      card.style.setProperty('--i', index);
+      return card;
+    });
+
+    return el('section', { class: 'pack-expand', 'aria-label': `Contenido del pack ${pack.nombre}` }, [
+      el('div', { class: 'pack-expand-head' }, [
+        el('div', {}, [
+          el('div', { class: 'pack-expand-title', text: pack.nombre }),
+          el('div', { class: 'pack-expand-sub', text: resumenPack(pack, ctx) }),
+        ]),
+        el('button', { type: 'button', class: 'pack-expand-close', 'aria-label': 'Cerrar pack', text: '✕', onclick: onClose }),
+      ]),
+      el('div', { class: 'piece-grid' }, cards),
+    ]);
+  }
+
+  /**
+   * Vista "Todo": cada pack aparece UNA sola vez (plegado, en el sitio de su
+   * primera pieza) y las piezas sin pack aparecen sueltas. Devuelve una lista
+   * de { pack } o { pieza }, respetando el orden de las piezas.
+   */
+  function agruparPorPack(items, ctx) {
+    const vistos = new Set();
+    const lista = [];
+    items.forEach((pieza) => {
+      const key = Data.slug(pieza.pack);
+      if (!key) { lista.push({ pieza }); return; }
+      if (vistos.has(key)) return;
+      vistos.add(key);
+      lista.push({ pack: ctx.packs.get(key) });
+    });
+    return lista;
   }
 
   function renderDiseno(container, { piezas, tipos }) {
@@ -201,9 +255,12 @@
       tiposById: Object.fromEntries(tipos.map((t) => [t.id, t])),
       packs: buildPacks(items),
     };
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const elementosTodo = agruparPorPack(items, ctx);
 
     // Pestañas: Todo, Packs (si hay) y un tipo por cada categoría que tenga contenido.
-    const pestañas = [{ id: 'todo', label: 'Todo', count: items.length }];
+    // El contador de "Todo" cuenta lo que se ve en esa vista (packs plegados + piezas sueltas).
+    const pestañas = [{ id: 'todo', label: 'Todo', count: elementosTodo.length }];
     if (ctx.packs.size) pestañas.push({ id: 'packs', label: 'Packs', count: ctx.packs.size });
     tipos.forEach((tipo) => {
       const count = items.filter((p) => p.tipo === tipo.id).length;
@@ -213,10 +270,73 @@
     const tablist = el('div', { class: 'tabs', role: 'tablist', 'aria-label': 'Categorías de diseño' });
     const panel = el('div', { class: 'piece-grid', role: 'tabpanel', id: 'diseno-panel' });
 
+    // --- Despliegue de packs ---------------------------------------------
+    // Solo hay un pack abierto a la vez: { card, pack, panelEl } o null.
+    let abierto = null;
+
+    const cerrarPack = ({ devolverFoco = false } = {}) => {
+      if (!abierto) return;
+      const { card, panelEl } = abierto;
+      panelEl.remove();
+      card.setAttribute('aria-expanded', 'false');
+      abierto = null;
+      if (devolverFoco) card.focus();
+    };
+
+    // El panel ocupa todo el ancho de la rejilla, así que se coloca justo
+    // detrás de la última tarjeta de la fila del pack pulsado (las tarjetas
+    // de una misma fila comparten offsetTop). Se recalcula al cambiar el
+    // tamaño de la ventana, porque entonces cambia cuántas caben por fila.
+    const colocarPanel = () => {
+      if (!abierto) return;
+      const { card, panelEl } = abierto;
+      panelEl.remove(); // se quita un momento para medir las filas sin él
+      const hermanas = [...panel.children];
+      let ultima = card;
+      for (let i = hermanas.indexOf(card) + 1; i < hermanas.length; i++) {
+        if (hermanas[i].offsetTop !== card.offsetTop) break;
+        ultima = hermanas[i];
+      }
+      ultima.after(panelEl);
+    };
+
+    const alternarPack = (card, pack) => {
+      const eraElMismo = abierto && abierto.card === card;
+      cerrarPack();
+      if (eraElMismo) return; // pulsar otra vez el mismo pack lo pliega
+
+      const panelEl = packPanel(pack, ctx, () => cerrarPack({ devolverFoco: true }));
+      // La animación de apertura solo se reproduce al abrir, no al recolocar.
+      panelEl.classList.add('is-opening');
+      panelEl.addEventListener('animationend', (event) => {
+        if (event.target === panelEl) panelEl.classList.remove('is-opening');
+      });
+
+      abierto = { card, pack, panelEl };
+      card.setAttribute('aria-expanded', 'true');
+      colocarPanel();
+      panelEl.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+    };
+
+    window.addEventListener('resize', colocarPanel);
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || !abierto) return;
+      if (document.querySelector('.lightbox-overlay.open')) return; // el visor tiene prioridad
+      cerrarPack({ devolverFoco: true });
+    });
+
+    // --- Contenido de cada pestaña ---------------------------------------
     const cardsFor = (tabId) => {
-      if (tabId === 'packs') return [...ctx.packs.values()].map((pack) => packCard(pack, ctx));
-      const lista = tabId === 'todo' ? items : items.filter((p) => p.tipo === tabId);
-      return lista.map((pieza) => piezaCard(pieza, ctx));
+      if (tabId === 'packs') {
+        return [...ctx.packs.values()].map((pack) => packCard(pack, ctx, alternarPack));
+      }
+      if (tabId === 'todo') {
+        return elementosTodo.map((entrada) => (
+          entrada.pack ? packCard(entrada.pack, ctx, alternarPack) : piezaCard(entrada.pieza, ctx)
+        ));
+      }
+      // Pestañas de tipo (Logos, Overlays...): piezas sueltas filtradas por tipo.
+      return items.filter((p) => p.tipo === tabId).map((pieza) => piezaCard(pieza, ctx));
     };
 
     const selectTab = (tabId, { updateHash = true } = {}) => {
@@ -227,6 +347,7 @@
         button.tabIndex = selected ? 0 : -1;
       });
       panel.setAttribute('aria-labelledby', `tab-${activa.id}`);
+      abierto = null; // al cambiar de pestaña se descarta cualquier pack desplegado
       const cards = cardsFor(activa.id);
       cards.forEach((card, index) => card.style.setProperty('--i', index));
       panel.replaceChildren(...cards);
@@ -275,13 +396,118 @@
     ]);
   }
 
-  function videoCard(pieza) {
+  /** Tarjeta de vídeo. Dentro de un pack desplegado (enPanel) va en rejilla, no en el carrusel. */
+  function videoCard(pieza, { enPanel = false } = {}) {
     const href = safeUrl(pieza.url);
     const media = mediaBlock(pieza, { overlay: el('div', { class: 'playbtn' }) });
     const link = href
       ? el('a', { class: 'card-media-link', href, target: '_blank', rel: 'noopener', 'aria-label': `Ver vídeo: ${pieza.titulo}` }, media)
       : media;
-    return el('div', { class: 'card carousel-item carousel-item--card' }, [link, cardBody(pieza)]);
+    return el('div', { class: enPanel ? 'card' : 'card carousel-item carousel-item--card' }, [link, cardBody(pieza)]);
+  }
+
+  /** Pack de vídeos en el carrusel: mosaico de miniaturas + recuento. Al pulsarlo se despliega (ver renderVideo). */
+  function videoPackCard(pack, onToggle) {
+    const visibles = pack.piezas.slice(0, 4);
+    const resto = pack.piezas.length - visibles.length;
+    const cells = visibles.map((pieza, index) => {
+      const cell = el('div', { class: 'mosaic-cell' });
+      const src = pieza.ruta || youtubeThumb(pieza.url);
+      if (src) {
+        const img = el('img', { src, alt: pieza.titulo, loading: 'lazy', decoding: 'async' });
+        img.addEventListener('error', () => img.remove());
+        cell.append(img);
+      }
+      if (index === visibles.length - 1 && resto > 0) cell.append(el('span', { class: 'mosaic-more', text: `+${resto}` }));
+      return cell;
+    });
+
+    const recuento = pack.piezas.length === 1 ? '1 vídeo' : `${pack.piezas.length} vídeos`;
+    const card = el('button', {
+      type: 'button',
+      class: 'card carousel-item carousel-item--card card-button video-pack',
+      'aria-expanded': 'false',
+      'aria-label': `Pack ${pack.nombre}: ${recuento}. Pulsa para ver los vídeos`,
+      onclick: () => onToggle(card, pack),
+    }, [
+      el('div', { class: 'piece-media aspect-16-9 mosaic', 'data-count': Math.min(visibles.length, 4) }, cells),
+      el('div', { class: 'card-body' }, [
+        el('div', { class: 'piece-title-row' }, [
+          el('div', { class: 'card-title', text: pack.nombre }),
+          el('span', { class: 'pack-chevron', 'aria-hidden': 'true', text: '▾' }),
+        ]),
+        el('div', { class: 'card-sub', text: `Pack · ${recuento}` }),
+      ]),
+    ]);
+    return card;
+  }
+
+  /**
+   * Página de vídeo: cada pack sale UNA vez en el carrusel (en el sitio de su
+   * primer vídeo) y los vídeos sin pack salen sueltos. Al pulsar un pack se
+   * despliega bajo el carrusel una rejilla con todos sus vídeos.
+   */
+  function renderVideo(target, piezas) {
+    const items = piezas.filter((p) => p.seccion === 'video');
+    if (!items.length) { renderCarousel(target, [], 'Próximamente: aquí irán los vídeos.'); return; }
+
+    const packs = buildPacks(items);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let abierto = null; // { card, panelEl } del pack desplegado
+
+    const cerrar = ({ devolverFoco = false } = {}) => {
+      if (!abierto) return;
+      abierto.panelEl.remove();
+      abierto.card.setAttribute('aria-expanded', 'false');
+      if (devolverFoco) abierto.card.focus();
+      abierto = null;
+    };
+
+    const alternar = (card, pack) => {
+      const eraElMismo = abierto && abierto.card === card;
+      cerrar();
+      if (eraElMismo) return;
+
+      const recuento = pack.piezas.length === 1 ? '1 vídeo' : `${pack.piezas.length} vídeos`;
+      const tarjetas = pack.piezas.map((pieza, index) => {
+        const tarjeta = videoCard(pieza, { enPanel: true });
+        tarjeta.style.setProperty('--i', index);
+        return tarjeta;
+      });
+      const panelEl = el('section', { class: 'pack-expand pack-expand--video is-opening', 'aria-label': `Vídeos del pack ${pack.nombre}` }, [
+        el('div', { class: 'pack-expand-head' }, [
+          el('div', {}, [
+            el('div', { class: 'pack-expand-title', text: pack.nombre }),
+            el('div', { class: 'pack-expand-sub', text: recuento }),
+          ]),
+          el('button', { type: 'button', class: 'pack-expand-close', 'aria-label': 'Cerrar pack', text: '✕', onclick: () => cerrar({ devolverFoco: true }) }),
+        ]),
+        el('div', { class: 'piece-grid' }, tarjetas),
+      ]);
+      panelEl.addEventListener('animationend', (event) => {
+        if (event.target === panelEl) panelEl.classList.remove('is-opening');
+      });
+
+      abierto = { card, panelEl };
+      card.setAttribute('aria-expanded', 'true');
+      target.after(panelEl); // bajo el carrusel, a todo el ancho
+      panelEl.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+    };
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && abierto) cerrar({ devolverFoco: true });
+    });
+
+    const vistos = new Set();
+    const tarjetas = [];
+    items.forEach((pieza) => {
+      const key = Data.slug(pieza.pack);
+      if (!key) { tarjetas.push(videoCard(pieza)); return; }
+      if (vistos.has(key)) return;
+      vistos.add(key);
+      tarjetas.push(videoPackCard(packs.get(key), alternar));
+    });
+    renderCarousel(target, tarjetas, '');
   }
 
   function webCard(pieza) {
@@ -340,7 +566,7 @@
 
     switch (target.dataset.render) {
       case 'video':
-        return renderCarousel(target, piezas.filter((p) => p.seccion === 'video').map(videoCard), 'Próximamente: aquí irán los vídeos.');
+        return renderVideo(target, piezas);
       case 'web':
         return renderCarousel(target, piezas.filter((p) => p.seccion === 'web').map(webCard), 'Próximamente: aquí irán los proyectos web.');
       case 'destacados':

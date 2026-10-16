@@ -601,6 +601,21 @@ a.card, .card-media-link{ display:block; color:inherit; }
 .pack-expand-close:hover{ color:var(--accent2); border-color:var(--accent2); transform:scale(1.08); }
 
 
+/* Packs de vídeo: la tarjeta del carrusel reutiliza el mosaico y la flecha
+   de los packs de diseño; al pulsarla se despliega la rejilla bajo el carrusel */
+.video-pack[aria-expanded="true"]{
+  border-color:var(--accent2);
+  box-shadow:0 0 0 1px var(--accent2), 0 24px 48px rgba(0,0,0,0.3);
+}
+.video-pack[aria-expanded="true"] .pack-chevron{ transform:rotate(180deg); }
+.video-pack .card-title{ min-width:0; }
+.pack-expand--video{ margin-top:22px; }
+.pack-expand--video .piece-grid .card{
+  animation:piece-in .5s cubic-bezier(.16,.84,.44,1) backwards;
+  animation-delay:calc(var(--i, 0) * 45ms);
+}
+@media (prefers-reduced-motion: reduce){ .pack-expand--video .piece-grid .card{ animation:none; } }
+
 /* ===========================================================
    12. VISOR DE IMÁGENES (LIGHTBOX)
    Overlay a pantalla completa que construye initLightbox() en

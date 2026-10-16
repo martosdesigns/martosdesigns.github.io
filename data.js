@@ -13,7 +13,8 @@
  *     titulo     texto que se muestra en la tarjeta
  *     subtitulo  texto secundario (ej. "Personal" o el nombre del cliente)
  *     ruta       imagen de la pieza, ej. "assets/logos/logo-01.jpg"
- *     pack       nombre del pack al que pertenece (opcional, solo diseño)
+ *     pack       nombre del pack al que pertenece (opcional, diseño y vídeo;
+ *                cada sección tiene sus propios packs)
  *     url        enlace del vídeo (YouTube) o de la web en vivo
  *     etiquetas  lista de textos, ej. ["HTML", "CSS"] (solo web)
  *     destacado  true → sale en "Proyectos destacados" de la portada
@@ -49,6 +50,9 @@
     { id: 'logo', nombre: 'Logos', aspecto: '1:1', fondo: 'claro' },
     { id: 'overlay', nombre: 'Overlays', aspecto: '16:9', fondo: 'oscuro' },
     { id: 'miniatura', nombre: 'Miniaturas', aspecto: '16:9', fondo: 'oscuro' },
+    // Cajón de sastre para lo que no encaja en los demás tipos (banners, pósters...).
+    // Es cuadrado (1:1) para que la imagen se vea entera, sin recortes.
+    { id: 'otros', nombre: 'Otros', aspecto: '1:1', fondo: 'oscuro' },
   ];
 
   /** Contenido de ejemplo para el modo demostración. */
@@ -62,7 +66,8 @@
     { id: 'demo-m2', seccion: 'diseno', tipo: 'miniatura', titulo: 'Miniatura #2', pack: 'VLOG en Japón', orden: 2, creado: 1700000019000 },
     { id: 'demo-m3', seccion: 'diseno', tipo: 'miniatura', titulo: 'Miniatura #3', pack: 'VLOG en Japón', orden: 3, creado: 1700000018000 },
     { id: 'demo-m4', seccion: 'diseno', tipo: 'logo', titulo: 'Logo del canal', pack: 'VLOG en Japón', orden: 4, creado: 1700000017000 },
-    { id: 'demo-v1', seccion: 'video', titulo: 'VLOG en JAPÓN #1', subtitulo: 'Personal', ruta: 'assets/video/vlog-japon-1.jpg', url: 'https://www.youtube.com/watch?v=3Z7yGwcP_nc&t=163s', destacado: true, orden: 1, creado: 1700000030000 },
+    { id: 'demo-v1', seccion: 'video', titulo: 'VLOG en JAPÓN #1', subtitulo: 'Personal', pack: 'Japón', ruta: 'assets/video/vlog-japon-1.jpg', url: 'https://www.youtube.com/watch?v=3Z7yGwcP_nc&t=163s', destacado: true, orden: 1, creado: 1700000030000 },
+    { id: 'demo-v3', seccion: 'video', titulo: 'VLOG en JAPÓN #2', subtitulo: 'Personal', pack: 'Japón', url: 'https://www.youtube.com/watch?v=3Z7yGwcP_nc', orden: 2, creado: 1700000025000 },
     { id: 'demo-v2', seccion: 'video', titulo: 'Proyecto de vídeo de ejemplo', subtitulo: 'Cliente / marca', orden: 2, creado: 1700000005000 },
     { id: 'demo-w1', seccion: 'web', titulo: 'Proyecto web de ejemplo 1', subtitulo: 'Breve descripción del proyecto', etiquetas: ['HTML', 'CSS', 'JS'], orden: 1, creado: 1700000004000 },
     { id: 'demo-w2', seccion: 'web', titulo: 'Proyecto web de ejemplo 2', subtitulo: 'Breve descripción del proyecto', etiquetas: ['HTML', 'CSS', 'JS'], orden: 2, creado: 1700000003000 },

@@ -411,9 +411,10 @@
     });
   }
 
-  /** Sugiere los packs que ya existen al escribir el nombre de uno. */
+  /** Sugiere los packs que ya existen en la sección elegida (los packs de diseño y de vídeo van por separado). */
   function refreshPackList() {
-    const nombres = [...new Set(state.piezas.map((p) => p.pack).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
+    const seccion = $('f-seccion').value;
+    const nombres = [...new Set(state.piezas.filter((p) => p.seccion === seccion).map((p) => p.pack).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
     $('packs-list').replaceChildren(...nombres.map((nombre) => el('option', { value: nombre })));
   }
 
@@ -428,6 +429,7 @@
       video: 'Miniatura del vídeo (ruta)',
       web: 'Captura de la web (ruta)',
     }[seccion];
+    refreshPackList();
     $('f-url-label').textContent = seccion === 'video' ? 'Enlace del vídeo (YouTube)' : 'Enlace de la web en vivo (opcional)';
   }
 
@@ -475,7 +477,7 @@
       titulo: $('f-titulo').value.trim(),
       subtitulo: seccion === 'diseno' ? '' : $('f-subtitulo').value.trim(),
       ruta: normalizePath($('f-ruta').value),
-      pack: seccion === 'diseno' ? $('f-pack').value.trim() : '',
+      pack: seccion === 'web' ? '' : $('f-pack').value.trim(),
       url: seccion === 'diseno' ? '' : $('f-url').value.trim(),
       etiquetas: seccion === 'web' ? $('f-etiquetas').value.split(',').map((t) => t.trim()).filter(Boolean) : [],
       destacado: $('f-destacado').checked,
