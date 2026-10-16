@@ -61,7 +61,8 @@ body.admin.modal-open{ overflow:hidden; }
 .admin-toolbar{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:20px; }
 .admin-toolbar .tabs{ margin-bottom:0; }
 .admin-actions{ display:flex; gap:8px; flex-wrap:wrap; }
-.admin-filter{ margin-bottom:20px; }
+.admin-filter{ display:flex; flex-wrap:wrap; align-items:center; gap:12px 20px; margin-bottom:20px; }
+.admin-pack-actions{ display:flex; gap:8px; flex-wrap:wrap; }
 
 
 /* ===========================================================

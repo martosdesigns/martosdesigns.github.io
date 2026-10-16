@@ -84,11 +84,20 @@
         </div>
       </div>
 
-      <div class="admin-filter" id="tipo-filter-wrap">
-        <label class="field field-inline">
+      <div class="admin-filter">
+        <label class="field field-inline" id="tipo-filter-wrap">
           <span>Mostrar</span>
           <select id="tipo-filter"></select>
         </label>
+        <label class="field field-inline" id="pack-filter-wrap">
+          <span>Pack</span>
+          <select id="pack-filter"></select>
+        </label>
+        <!-- Solo aparece al elegir un pack concreto: atajos para meterle contenido -->
+        <div class="admin-pack-actions" id="pack-actions" hidden>
+          <button type="button" class="btn btn-small btn-primary" id="btn-pack-add">Añadir al pack</button>
+          <button type="button" class="btn btn-small" id="btn-pack-bulk">Añadir varias al pack</button>
+        </div>
       </div>
 
       <p class="notice" id="load-error" role="alert" hidden></p>

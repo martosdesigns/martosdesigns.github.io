@@ -38,6 +38,7 @@
     tipos: [],
     seccion: 'diseno',
     tipoFiltro: '',
+    packFiltro: '', // '' = todos · '__none' = sin pack · otro valor = nombre de un pack
     editandoId: null,
   };
 
@@ -227,6 +228,7 @@
   /** Vuelve a pintar todo lo que depende de las piezas y los tipos. */
   function refreshAll() {
     refreshTipoSelects();
+    refreshPackFilter();
     refreshPackList();
     renderToolbar();
     renderList();
@@ -240,9 +242,37 @@
 
   /** Piezas de la sección (y tipo) que se están viendo, en el mismo orden que la web pública. */
   function currentList() {
-    const lista = state.piezas.filter((pieza) =>
-      pieza.seccion === state.seccion && (state.seccion !== 'diseno' || !state.tipoFiltro || pieza.tipo === state.tipoFiltro));
+    const lista = state.piezas.filter((pieza) => {
+      if (pieza.seccion !== state.seccion) return false;
+      if (state.seccion === 'diseno' && state.tipoFiltro && pieza.tipo !== state.tipoFiltro) return false;
+      if (state.packFiltro === '__none') return !pieza.pack;
+      if (state.packFiltro) return Data.slug(pieza.pack) === Data.slug(state.packFiltro);
+      return true;
+    });
     return Data.sortPiezas(lista);
+  }
+
+  /** ¿Hay un pack concreto elegido en el filtro (no "todos" ni "sin pack")? */
+  const hayPackElegido = () => Boolean(state.packFiltro) && state.packFiltro !== '__none';
+
+  /** Rellena el filtro de packs con los de la sección actual y conserva la selección si sigue existiendo. */
+  function refreshPackFilter() {
+    const filtro = $('pack-filter');
+    // Un nombre por pack (se compara sin tildes ni mayúsculas); gana el de la primera pieza, como en la web.
+    const porClave = new Map();
+    Data.sortPiezas(state.piezas.filter((p) => p.seccion === state.seccion && p.pack))
+      .forEach((p) => { if (!porClave.has(Data.slug(p.pack))) porClave.set(Data.slug(p.pack), p.pack); });
+    const nombres = [...porClave.values()].sort((a, b) => a.localeCompare(b, 'es'));
+    filtro.replaceChildren(
+      el('option', { value: '', text: 'Todos' }),
+      el('option', { value: '__none', text: 'Sin pack' }),
+      ...nombres.map((nombre) => el('option', { value: nombre, text: nombre })),
+    );
+    const sigue = state.packFiltro === '__none' || nombres.some((n) => Data.slug(n) === Data.slug(state.packFiltro));
+    if (!sigue) state.packFiltro = '';
+    const elegido = nombres.find((n) => Data.slug(n) === Data.slug(state.packFiltro));
+    filtro.value = state.packFiltro === '__none' ? '__none' : (elegido || '');
+    state.packFiltro = filtro.value;
   }
 
   function renderToolbar() {
@@ -255,6 +285,9 @@
     $('btn-bulk').hidden = !esDiseno;
     $('btn-tipos').hidden = !esDiseno;
     $('tipo-filter-wrap').hidden = !esDiseno;
+    $('pack-filter-wrap').hidden = state.seccion === 'web'; // la web no tiene packs
+    $('pack-actions').hidden = !hayPackElegido();
+    $('btn-pack-bulk').hidden = !esDiseno; // el alta múltiple es solo de diseño
   }
 
   function renderRow(pieza, index, total) {
@@ -291,6 +324,7 @@
       el('div', { class: 'pieza-actions' }, [
         up,
         down,
+        pieza.pack ? action('add-to-pack', '+ Al pack') : null,
         action('toggle-destacado', pieza.destacado ? 'Quitar destacada' : 'Destacar'),
         action('toggle-visible', pieza.visible ? 'Ocultar' : 'Mostrar'),
         action('edit', 'Editar'),
@@ -303,8 +337,8 @@
     const piezas = currentList();
     const list = $('piezas-list');
     if (!piezas.length) {
-      const aviso = state.seccion === 'diseno' && state.tipoFiltro
-        ? 'No hay piezas de este tipo.'
+      const aviso = (state.seccion === 'diseno' && state.tipoFiltro) || state.packFiltro
+        ? 'No hay piezas con este filtro.'
         : `Todavía no hay piezas en ${NOMBRE_SECCION[state.seccion]}. Pulsa "Añadir pieza" para crear la primera.`;
       list.replaceChildren(el('li', { class: 'admin-empty', text: aviso }));
       return;
@@ -374,6 +408,8 @@
       case 'up': return movePieza(id, -1);
       case 'down': return movePieza(id, 1);
       case 'edit': return openPiezaForm(pieza);
+      // Pieza nueva que hereda sección, tipo y pack de la pulsada
+      case 'add-to-pack': return openPiezaForm(null, { seccion: pieza.seccion, tipo: pieza.tipo, pack: pieza.pack });
       case 'delete': return deletePieza(id);
       case 'toggle-visible':
         return updatePieza(id, { visible: !pieza.visible }, pieza.visible ? 'Pieza oculta en la web.' : 'Pieza visible en la web.');
@@ -386,7 +422,9 @@
   function selectSeccion(seccion) {
     state.seccion = seccion;
     state.tipoFiltro = '';
+    state.packFiltro = '';
     $('tipo-filter').value = '';
+    refreshPackFilter();
     renderToolbar();
     renderList();
   }
@@ -447,17 +485,18 @@
     img.src = ruta;
   }
 
-  function openPiezaForm(pieza = null) {
+  /** prefill (solo piezas nuevas): { seccion, tipo, pack } para rellenar el formulario de antemano. */
+  function openPiezaForm(pieza = null, prefill = {}) {
     state.editandoId = pieza ? pieza.id : null;
     $('modal-pieza-title').textContent = pieza ? 'Editar pieza' : 'Añadir pieza';
     showError('f-error', '');
 
-    $('f-seccion').value = pieza ? pieza.seccion : state.seccion;
-    $('f-tipo').value = pieza && pieza.tipo ? pieza.tipo : (state.tipoFiltro || (state.tipos[0] && state.tipos[0].id) || '');
+    $('f-seccion').value = pieza ? pieza.seccion : (prefill.seccion || state.seccion);
+    $('f-tipo').value = pieza && pieza.tipo ? pieza.tipo : (prefill.tipo || state.tipoFiltro || (state.tipos[0] && state.tipos[0].id) || '');
     $('f-titulo').value = pieza ? pieza.titulo : '';
     $('f-subtitulo').value = pieza ? pieza.subtitulo : '';
     $('f-ruta').value = pieza ? pieza.ruta : '';
-    $('f-pack').value = pieza ? pieza.pack : '';
+    $('f-pack').value = pieza ? pieza.pack : (prefill.pack || (hayPackElegido() ? state.packFiltro : ''));
     $('f-url').value = pieza ? pieza.url : '';
     $('f-etiquetas').value = pieza ? pieza.etiquetas.join(', ') : '';
     $('f-destacado').checked = pieza ? pieza.destacado : false;
@@ -533,10 +572,10 @@
   // 6. ALTA DE VARIAS PIEZAS DE GOLPE
   // ===========================================================
 
-  function openBulkForm() {
+  function openBulkForm(pack = '') {
     showError('b-error', '');
     $('b-rutas').value = '';
-    $('b-pack').value = '';
+    $('b-pack').value = pack;
     $('b-visible').checked = true;
     $('b-tipo').value = state.tipoFiltro || (state.tipos[0] && state.tipos[0].id) || '';
     openModal('modal-bulk');
@@ -669,7 +708,14 @@
     $('piezas-list').addEventListener('click', handleListClick);
 
     $('btn-add').addEventListener('click', () => openPiezaForm());
-    $('btn-bulk').addEventListener('click', openBulkForm);
+    $('btn-bulk').addEventListener('click', () => openBulkForm());
+    $('pack-filter').addEventListener('change', (event) => {
+      state.packFiltro = event.target.value;
+      renderToolbar();
+      renderList();
+    });
+    $('btn-pack-add').addEventListener('click', () => openPiezaForm(null, { pack: state.packFiltro }));
+    $('btn-pack-bulk').addEventListener('click', () => openBulkForm(state.packFiltro));
     $('btn-tipos').addEventListener('click', openTiposForm);
     $('btn-add-tipo').addEventListener('click', () => {
       const row = tipoRow();
