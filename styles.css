@@ -325,8 +325,10 @@ section{ padding:110px 0; }
 .card .browser{ background:#2C2C2E; }
 .card .browser span{ background:rgba(255,255,255,0.18); }
 .card-body{ padding:18px 20px 22px; }
-.card-title{ font-weight:600; font-size:15px; color:#F5F5F7; }
-.card-sub{ font-size:13px; color:#A1A1A6; margin-top:4px; }
+/* Título y subtítulo en una sola línea: si no caben se cortan con "…",
+   así todas las tarjetas de una fila miden lo mismo */
+.card-title{ font-weight:600; font-size:15px; color:#F5F5F7; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.card-sub{ font-size:13px; color:#A1A1A6; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .card .tag{ color:#A1A1A6; border-color:rgba(255,255,255,0.16); }
 
 /* Tarjetas que son un enlace (<a>) o un botón (<button>): se resetea el
@@ -540,14 +542,20 @@ a.card, .card-media-link{ display:block; color:inherit; }
 .fondo-claro .piece-placeholder{ border-color:rgba(0,0,0,0.2); color:#6E6E73; }
 
 .piece-body{ padding:14px 16px 18px; }
-.piece-title{ font-weight:600; font-size:14px; color:#F5F5F7; }
+.piece-title{
+  font-weight:600; font-size:14px; color:#F5F5F7;
+  min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; /* una línea, con "…" */
+}
 .piece-meta{
-  display:flex; flex-wrap:wrap; gap:6px; align-items:center;
+  display:flex; flex-wrap:nowrap; gap:6px; align-items:center; min-width:0; overflow:hidden;
   margin-top:6px; font-size:12px; color:#A1A1A6;
 }
+.piece-meta > *{ flex:none; }
+.piece-meta > .pack-badge{ flex:0 1 auto; min-width:0; }
 .pack-badge{
   border:1px solid rgba(255,255,255,0.18); border-radius:999px;
   padding:2px 9px; font-size:11px; color:var(--accent2);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 
 /* Mosaico de un pack: se reparte según cuántas imágenes tenga */

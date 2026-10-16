@@ -149,7 +149,7 @@
         contain: tipo ? tipo.aspecto === '1:1' : false,
       }),
       el('div', { class: 'piece-body' }, [
-        el('div', { class: 'piece-title', text: pieza.titulo }),
+        el('div', { class: 'piece-title', title: pieza.titulo, text: pieza.titulo }),
         el('div', { class: 'piece-meta' }, meta),
       ]),
     ]);
@@ -195,7 +195,7 @@
       el('div', { class: 'piece-media aspect-16-9 mosaic', 'data-count': Math.min(visibles.length, 4) }, cells),
       el('div', { class: 'piece-body' }, [
         el('div', { class: 'piece-title-row' }, [
-          el('div', { class: 'piece-title', text: pack.nombre }),
+          el('div', { class: 'piece-title', title: pack.nombre, text: pack.nombre }),
           el('span', { class: 'pack-chevron', 'aria-hidden': 'true', text: '▾' }),
         ]),
         el('div', { class: 'piece-meta' }, [
@@ -390,7 +390,7 @@
 
   function cardBody(pieza, extra = []) {
     return el('div', { class: 'card-body' }, [
-      el('div', { class: 'card-title', text: pieza.titulo }),
+      el('div', { class: 'card-title', title: pieza.titulo, text: pieza.titulo }),
       pieza.subtitulo ? el('div', { class: 'card-sub', text: pieza.subtitulo }) : null,
       ...extra,
     ]);
@@ -433,7 +433,7 @@
       el('div', { class: 'piece-media aspect-16-9 mosaic', 'data-count': Math.min(visibles.length, 4) }, cells),
       el('div', { class: 'card-body' }, [
         el('div', { class: 'piece-title-row' }, [
-          el('div', { class: 'card-title', text: pack.nombre }),
+          el('div', { class: 'card-title', title: pack.nombre, text: pack.nombre }),
           el('span', { class: 'pack-chevron', 'aria-hidden': 'true', text: '▾' }),
         ]),
         el('div', { class: 'card-sub', text: `Pack · ${recuento}` }),
