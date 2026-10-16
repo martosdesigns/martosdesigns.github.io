@@ -18,6 +18,8 @@
  *     url        enlace del vídeo (YouTube) o de la web en vivo
  *     etiquetas  lista de textos, ej. ["HTML", "CSS"] (solo web)
  *     destacado  true → sale en "Proyectos destacados" de la portada
+ *     ultimo     true → sale en "Últimos trabajos" de la portada. Si ninguna pieza
+ *                lo tiene, la portada enseña las más recientes automáticamente
  *     visible    false → oculta en la web pública (sigue en el panel)
  *     orden      número; menor = antes. Se reordena desde el panel
  *     creado     fecha de creación en milisegundos (para "Últimos trabajos")
@@ -100,6 +102,7 @@
       url: String(raw.url || '').trim(),
       etiquetas: Array.isArray(raw.etiquetas) ? raw.etiquetas.map(String).filter(Boolean) : [],
       destacado: Boolean(raw.destacado),
+      ultimo: Boolean(raw.ultimo),
       visible: raw.visible !== false,
       orden: Number.isFinite(raw.orden) ? raw.orden : 0,
       creado: Number.isFinite(raw.creado) ? raw.creado : 0,

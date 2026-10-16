@@ -572,7 +572,12 @@
       case 'destacados':
         return renderCarousel(target, piezas.filter((p) => p.destacado).slice(0, MAX_PORTADA).map((p) => homeCard(p, ctx)), 'Próximamente.');
       case 'ultimos': {
-        const recientes = piezas.slice().sort((a, b) => b.creado - a.creado).slice(0, MAX_PORTADA);
+        // Si has marcado piezas a mano en el panel se enseñan esas (en el orden del panel);
+        // si no hay ninguna marcada, se usan las más recientes por fecha de alta.
+        const elegidas = piezas.filter((p) => p.ultimo);
+        const recientes = elegidas.length
+          ? elegidas.slice(0, MAX_PORTADA)
+          : piezas.slice().sort((a, b) => b.creado - a.creado).slice(0, MAX_PORTADA);
         return renderCarousel(target, recientes.map((p) => homeCard(p, ctx)), 'Próximamente.');
       }
       default:

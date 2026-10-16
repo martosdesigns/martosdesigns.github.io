@@ -295,6 +295,7 @@
       pieza.seccion === 'diseno' && tipoNombre(pieza.tipo) ? el('span', { text: tipoNombre(pieza.tipo) }) : null,
       pieza.pack ? el('span', { class: 'badge', text: `Pack · ${pieza.pack}` }) : null,
       pieza.destacado ? el('span', { class: 'badge badge-accent', text: 'Destacada' }) : null,
+      pieza.ultimo ? el('span', { class: 'badge badge-accent', text: 'Últimos' }) : null,
       !pieza.visible ? el('span', { class: 'badge', text: 'Oculta' }) : null,
     ];
 
@@ -326,6 +327,7 @@
         down,
         pieza.pack ? action('add-to-pack', '+ Al pack') : null,
         action('toggle-destacado', pieza.destacado ? 'Quitar destacada' : 'Destacar'),
+        action('toggle-ultimo', pieza.ultimo ? 'Quitar de últimos' : 'A últimos'),
         action('toggle-visible', pieza.visible ? 'Ocultar' : 'Mostrar'),
         action('edit', 'Editar'),
         action('delete', 'Borrar', 'btn-danger'),
@@ -415,6 +417,8 @@
         return updatePieza(id, { visible: !pieza.visible }, pieza.visible ? 'Pieza oculta en la web.' : 'Pieza visible en la web.');
       case 'toggle-destacado':
         return updatePieza(id, { destacado: !pieza.destacado }, pieza.destacado ? 'Ya no es destacada.' : 'Marcada como destacada.');
+      case 'toggle-ultimo':
+        return updatePieza(id, { ultimo: !pieza.ultimo }, pieza.ultimo ? 'Quitada de "Últimos trabajos".' : 'Añadida a "Últimos trabajos".');
       default: return undefined;
     }
   }
@@ -500,6 +504,7 @@
     $('f-url').value = pieza ? pieza.url : '';
     $('f-etiquetas').value = pieza ? pieza.etiquetas.join(', ') : '';
     $('f-destacado').checked = pieza ? pieza.destacado : false;
+    $('f-ultimo').checked = pieza ? pieza.ultimo : false;
     $('f-visible').checked = pieza ? pieza.visible : true;
 
     updateFormVisibility();
@@ -520,6 +525,7 @@
       url: seccion === 'diseno' ? '' : $('f-url').value.trim(),
       etiquetas: seccion === 'web' ? $('f-etiquetas').value.split(',').map((t) => t.trim()).filter(Boolean) : [],
       destacado: $('f-destacado').checked,
+      ultimo: $('f-ultimo').checked,
       visible: $('f-visible').checked,
     };
   }
@@ -600,7 +606,7 @@
         // Orden consecutivo: la primera línea queda primero y todas antes que lo ya existente.
         const data = {
           seccion: 'diseno', tipo, titulo: titleFromPath(ruta), subtitulo: '', ruta,
-          pack: $('b-pack').value.trim(), url: '', etiquetas: [], destacado: false,
+          pack: $('b-pack').value.trim(), url: '', etiquetas: [], destacado: false, ultimo: false,
           visible: $('b-visible').checked, orden: -base + index, creado: base + index,
         };
         const ref = db.collection(COLECCION).doc();
